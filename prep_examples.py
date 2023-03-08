@@ -1,4 +1,5 @@
 import json
+from transformers import RobertaTokenizer, RobertaModel
 
 
 def get_contrast_pair(q_dict):
@@ -23,6 +24,19 @@ def get_contrast_pair(q_dict):
     return (p1, p2)
 
 
+def contrast_features(true_text, false_text, tokenizer, model, layer=10):
+    pos_tok = tokenizer(true_text, return_tensors='pt')
+    neg_tok = tokenizer(false_text, return_tensors='pt')
+
+    pos_feats = model(pos_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0][-1]
+    neg_feats = model(neg_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0][-1]
+
+    pos_feats = pos_feats.cpu().detach().numpy()
+    neg_feats = neg_feats.cpu().detach().numpy()
+
+    return pos_feats, neg_feats
+
+
 if __name__ == '__main__':
     data_path = "../../Downloads/boolQ/dev.jsonl"
     # Get the data
@@ -33,8 +47,10 @@ if __name__ == '__main__':
     q_dict = data[0]
 
     # Get the contrast pair
-    contrast_pair = get_contrast_pair(q_dict)
+    true_text, false_text = get_contrast_pair(q_dict)
 
-    # print(contrast_pair)
-    print(contrast_pair[0])
-    print(contrast_pair[1])
+    tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+    model = RobertaModel.from_pretrained('roberta-base')
+
+    feats = contrast_features(true_text, false_text, tokenizer, model)
+    print(feats)
