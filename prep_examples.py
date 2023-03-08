@@ -28,8 +28,8 @@ def get_contrast_pair(q_dict):
 
 
 def contrast_features(true_text, false_text, tokenizer, model, layer=10):
-    pos_tok = tokenizer(true_text, return_tensors='pt')
-    neg_tok = tokenizer(false_text, return_tensors='pt')
+    pos_tok = tokenizer(true_text, return_tensors='pt').to(model.device)
+    neg_tok = tokenizer(false_text, return_tensors='pt').to(model.device)
 
     if pos_tok.input_ids.shape[1] > 512:
         raise ValueError("Input too long!")
@@ -67,9 +67,11 @@ def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
 
 if __name__ == '__main__':
     data_path = "../../Downloads/boolQ/balanced_train.jsonl"
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
     model = RobertaModel.from_pretrained('roberta-base')
+    model.to(device)
     model.eval()
 
     feat_pairs = get_all_feats(data_path, tokenizer, model, layer=10, max_num=1000)
