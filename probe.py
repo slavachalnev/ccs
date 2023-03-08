@@ -34,7 +34,7 @@ def loss_fn(probs):
     p1 = probs[1][0]
 
     l_consistency = (p0 - (1 - p1)) ** 2
-    l_confidence = torch.min(p0, p1) ** 2
+    l_confidence = torch.min(p0**2, p1**2)
 
     return l_consistency + l_confidence
     
