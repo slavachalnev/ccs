@@ -24,7 +24,7 @@ def get_contrast_pair(q_dict):
     p1 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: True"
     p2 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: False"
     
-    return (p1, p2)
+    return p1, p2, answer
 
 
 def contrast_features(true_text, false_text, tokenizer, model, layer=10):
@@ -48,11 +48,12 @@ def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
     with open(data_path, 'r') as f:
         data = [json.loads(line) for line in f]
 
+    print('len data is ', len(data))
     all_feat_pairs = []
     for idx, q_dict in enumerate(data):
         if idx > max_num:
             break
-        true_text, false_text = get_contrast_pair(q_dict)
+        true_text, false_text, answer = get_contrast_pair(q_dict)
         print(f"Processing question {idx}...")
         try:
             feats = contrast_features(true_text, false_text, tokenizer, model, layer=layer)
@@ -60,18 +61,18 @@ def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
             print("Input too long!")
             continue
         all_feat_pairs.append(feats)
-
+    
     return all_feat_pairs
 
 
 if __name__ == '__main__':
-    data_path = "../../Downloads/boolQ/dev.jsonl"
+    data_path = "../../Downloads/boolQ/balanced_train.jsonl"
 
     tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
     model = RobertaModel.from_pretrained('roberta-base')
     model.eval()
 
-    feat_pairs = get_all_feats(data_path, tokenizer, model, layer=10, max_num=100)
+    feat_pairs = get_all_feats(data_path, tokenizer, model, layer=10, max_num=1000)
 
     # save as two numpy arrays
     pos_feats = [pair[0] for pair in feat_pairs]
@@ -81,10 +82,14 @@ if __name__ == '__main__':
     pos_feats = np.array(pos_feats)
     neg_feats = np.array(neg_feats)
 
+    np.save("pos_means.npy", pos_feats.mean(axis=0))
+    np.save("neg_means.npy", neg_feats.mean(axis=0))
     # subtract mean
     pos_feats -= pos_feats.mean(axis=0)
     neg_feats -= neg_feats.mean(axis=0)
 
+    np.save("pos_stds.npy", pos_feats.std(axis=0))
+    np.save("neg_stds.npy", neg_feats.std(axis=0))
     # divide by std
     pos_feats /= pos_feats.std(axis=0)
     neg_feats /= neg_feats.std(axis=0)
