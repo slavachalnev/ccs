@@ -40,7 +40,8 @@ def loss_fn(probs):
     
 
 def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.01):
-    model = Probe()
+    model_dim = pos_feats.shape[1]
+    model = Probe(d_model=model_dim)
     model.train()
 
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)

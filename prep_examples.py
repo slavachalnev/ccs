@@ -66,7 +66,7 @@ def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
 
 
 if __name__ == '__main__':
-    data_path = "../../Downloads/boolQ/balanced_train.jsonl"
+    data_path = "../boolQ/balanced_train.jsonl"
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     tokenizer = RobertaTokenizer.from_pretrained('roberta-base')

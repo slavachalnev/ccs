@@ -33,11 +33,13 @@ def inference_q(q_dict, model, probe, tokenizer, layer=10):
 
 
 if __name__=="__main__":
-    # test_path = "../../Downloads/boolQ/dev.jsonl"
-    test_path = "../../Downloads/boolQ/balanced_train.jsonl"
+    # test_path = "../boolQ/dev.jsonl"
+    test_path = "../boolQ/balanced_train.jsonl"
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
     model = RobertaModel.from_pretrained('roberta-base')
+    model.to(device)
     model.eval()
 
     probe = Probe()
