@@ -71,9 +71,6 @@ def train_probe(pos_feats, neg_feats, epochs=500, lr=0.01):
 
 if __name__ == "__main__":
     pos_feats, neg_feats = load_features()
-    print(pos_feats.shape)
-    print(neg_feats.shape)
-
     # pos feats shape is num_examples x d_model
 
     train_probe(torch.tensor(pos_feats), torch.tensor(neg_feats))

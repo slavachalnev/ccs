@@ -19,7 +19,7 @@ def get_contrast_pair(q_dict):
     question = q_dict['question']
 
     # Get the correct answer
-    answer = q_dict['answer']
+    answer = q_dict['answer'] # not used
 
     p1 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: True"
     p2 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: False"
@@ -45,7 +45,6 @@ def contrast_features(true_text, false_text, tokenizer, model, layer=10):
 
 
 def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
-    # Get the data
     with open(data_path, 'r') as f:
         data = [json.loads(line) for line in f]
 
@@ -53,13 +52,8 @@ def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
     for idx, q_dict in enumerate(data):
         if idx > max_num:
             break
-        # Get the contrast pair
         true_text, false_text = get_contrast_pair(q_dict)
         print(f"Processing question {idx}...")
-        # print(len(true_text))
-        # if idx == 55:
-        #     print(true_text)
-        #     print(false_text)
         try:
             feats = contrast_features(true_text, false_text, tokenizer, model, layer=layer)
         except ValueError:
