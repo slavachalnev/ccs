@@ -35,9 +35,11 @@ def loss_fn(probs):
     p1 = probs[1][0]
 
     l_consistency = (p0 - (1 - p1)) ** 2
-    l_confidence = torch.min(p0**2, p1**2)
+    # l_confidence = torch.min(p0**2, p1**2)
+    # l_conf = -(p0 * torch.log(p0 + 1e-8) + (1 - p1) * torch.log(1 - p1 + 1e-8))
+    l_conf = -(p0 - p1) ** 2
 
-    return l_consistency + l_confidence
+    return l_consistency + 0.5*l_conf
     
 
 def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.01):
@@ -59,7 +61,7 @@ def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.01):
 
             batch = torch.stack((pos_feat, neg_feat), dim=0)
             probs = model(batch)
-            if i == 0:
+            if i <= 5:
                 print(probs)
             loss = loss_fn(probs)
             average_loss += loss.item()

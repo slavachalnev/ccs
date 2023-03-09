@@ -8,7 +8,7 @@ from probe import Probe
 from prep_examples import get_contrast_pair, contrast_features
 
 
-def inference_q(q_dict, model, probe, tokenizer, layer=22):
+def inference_q(q_dict, model, probe, tokenizer, layer=-1):
     p1, p2, _ = get_contrast_pair(q_dict)
     pos_feats, neg_feats = contrast_features(p1, p2, tokenizer, model, layer=layer)
 
@@ -56,7 +56,7 @@ if __name__=="__main__":
         if idx > 100:
             break
         try:
-            res = inference_q(q_dict, model, probe, tokenizer, layer=22)
+            res = inference_q(q_dict, model, probe, tokenizer, layer=-1)
             print('pred:', res, 'answer:', q_dict['answer'])
             if res == q_dict['answer']:
                 correct += 1
