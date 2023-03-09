@@ -35,8 +35,8 @@ def contrast_features(true_text, false_text, tokenizer, model, layer=10):
         raise ValueError("Input too long!")
 
     with torch.no_grad():
-        pos_feats = model(pos_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0][-1]
-        neg_feats = model(neg_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0][-1]
+        pos_feats = model(pos_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0].mean(dim=0)
+        neg_feats = model(neg_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0].mean(dim=0)
 
     pos_feats = pos_feats.cpu().detach().numpy()
     neg_feats = neg_feats.cpu().detach().numpy()
