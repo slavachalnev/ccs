@@ -28,11 +28,8 @@ def get_contrast_pair(q_dict):
 
 
 def contrast_features(true_text, false_text, tokenizer, model, layer=22):
-    pos_tok = tokenizer(true_text, return_tensors='pt').to(model.device)
-    neg_tok = tokenizer(false_text, return_tensors='pt').to(model.device)
-
-    if pos_tok.input_ids.shape[1] > 512:
-        raise ValueError("Input too long!")
+    pos_tok = tokenizer(true_text, return_tensors='pt', truncation=True, padding="max_length").to(model.device)
+    neg_tok = tokenizer(false_text, return_tensors='pt', truncation=True, padding="max_length").to(model.device)
 
     with torch.no_grad():
         pos_feats = model(pos_tok.input_ids, output_hidden_states=True)['hidden_states'][layer][0].mean(dim=0)
@@ -54,12 +51,9 @@ def get_all_feats(data_path, tokenizer, model, layer=22, max_num=100):
         if idx > max_num:
             break
         true_text, false_text, answer = get_contrast_pair(q_dict)
+
         print(f"Processing question {idx}...")
-        try:
-            feats = contrast_features(true_text, false_text, tokenizer, model, layer=layer)
-        except ValueError:
-            print("Input too long!")
-            continue
+        feats = contrast_features(true_text, false_text, tokenizer, model, layer=layer)
         all_feat_pairs.append(feats)
     
     return all_feat_pairs

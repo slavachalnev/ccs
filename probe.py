@@ -1,4 +1,5 @@
 import os
+import random
 
 import torch
 import torch.nn as nn
@@ -50,7 +51,9 @@ def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.01):
         print(f"Epoch {epoch}...")
 
         average_loss = 0
-        for i in range(pos_feats.shape[0]):
+        idxs = list(range(pos_feats.shape[0]))
+        random.shuffle(idxs)
+        for i in idxs:
             pos_feat = pos_feats[i]
             neg_feat = neg_feats[i]
 
