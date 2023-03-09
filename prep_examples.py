@@ -27,7 +27,7 @@ def get_contrast_pair(q_dict):
     return p1, p2, answer
 
 
-def contrast_features(true_text, false_text, tokenizer, model, layer=10):
+def contrast_features(true_text, false_text, tokenizer, model, layer=22):
     pos_tok = tokenizer(true_text, return_tensors='pt').to(model.device)
     neg_tok = tokenizer(false_text, return_tensors='pt').to(model.device)
 
@@ -44,7 +44,7 @@ def contrast_features(true_text, false_text, tokenizer, model, layer=10):
     return pos_feats, neg_feats
 
 
-def get_all_feats(data_path, tokenizer, model, layer=10, max_num=100):
+def get_all_feats(data_path, tokenizer, model, layer=22, max_num=100):
     with open(data_path, 'r') as f:
         data = [json.loads(line) for line in f]
 
