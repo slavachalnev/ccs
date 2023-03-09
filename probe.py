@@ -28,51 +28,40 @@ class Probe(nn.Module):
         return x
     
 
-def loss_fn(probs):
-    assert probs.shape == (2, 1)
-
-    p0 = probs[0][0]
-    p1 = probs[1][0]
+def loss_fn(p0, p1):
 
     l_consistency = (p0 - (1 - p1)) ** 2
     # l_confidence = torch.min(p0**2, p1**2)
     # l_conf = -(p0 * torch.log(p0 + 1e-8) + (1 - p1) * torch.log(1 - p1 + 1e-8))
     l_conf = -(p0 - p1) ** 2
 
-    return l_consistency + 0.5*l_conf
+    loss = l_consistency.mean(0) + l_conf.mean(0)
+    return loss
     
 
-def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.01):
+def train_probe(pos_feats, neg_feats, epochs=1000, lr=0.001):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model_dim = pos_feats.shape[1]
     model = Probe(d_model=model_dim)
+    model.to(device)
     model.train()
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
 
     for epoch in range(epochs):
         print(f"Epoch {epoch}...")
 
-        average_loss = 0
-        idxs = list(range(pos_feats.shape[0]))
-        random.shuffle(idxs)
-        for i in idxs:
-            pos_feat = pos_feats[i]
-            neg_feat = neg_feats[i]
+        pos_batch = pos_feats.to(device)
+        neg_batch = neg_feats.to(device)
+        p0 = model(pos_batch)
+        p1 = model(neg_batch)
+        loss = loss_fn(p0, p1)
+        print(loss.item())
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-            batch = torch.stack((pos_feat, neg_feat), dim=0)
-            probs = model(batch)
-            if i <= 5:
-                print(probs)
-            loss = loss_fn(probs)
-            average_loss += loss.item()
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-        
-        average_loss /= pos_feats.shape[0]
-        print(f"Average loss: {average_loss}")
-    
     # Save the model
     torch.save(model.state_dict(), 'probe.pt')
 
