@@ -16,7 +16,7 @@ def load_features(path='.'):
 
 
 class Probe(nn.Module):
-    def __init__(self, d_model=768):
+    def __init__(self, d_model=1024):
         super(Probe, self).__init__()
         self.fc1 = nn.Linear(d_model, 1)
 

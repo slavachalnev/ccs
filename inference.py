@@ -29,7 +29,7 @@ def inference_q(q_dict, model, probe, tokenizer, layer=10):
     if res > 0.5:
         return True
     else:
-        return False 
+        return False
 
 
 if __name__=="__main__":
@@ -37,8 +37,8 @@ if __name__=="__main__":
     test_path = "../boolQ/balanced_train.jsonl"
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-    model = RobertaModel.from_pretrained('roberta-base')
+    tokenizer = RobertaTokenizer.from_pretrained('roberta-large')
+    model = RobertaModel.from_pretrained('roberta-large')
     model.to(device)
     model.eval()
 

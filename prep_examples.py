@@ -10,8 +10,8 @@ def get_contrast_pair(q_dict):
     Accepts a question dictionary and returns a contrast pair.
 
     Contrast pair is a tuple of two strings:
-    Passage: [passage]\n\nQuestion: [question]\n\nA: [True]
-    Passage: [passage]\n\nQuestion: [question]\n\nA: [False]
+    Passage: [passage]\n\nQuestion: [question]\n\nAnswer: True
+    Passage: [passage]\n\nQuestion: [question]\n\nAnswer: False
     """
 
     # Get the passage and question
@@ -21,8 +21,8 @@ def get_contrast_pair(q_dict):
     # Get the correct answer
     answer = q_dict['answer'] # not used
 
-    p1 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: True"
-    p2 = f"Passage: {passage}\n\nQuestion: {question}\n\nA: False"
+    p1 = f"Passage: {passage}\n\nQuestion: {question}\n\nAnswer: True"
+    p2 = f"Passage: {passage}\n\nQuestion: {question}\n\nAnswer: False"
     
     return p1, p2, answer
 
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     data_path = "../boolQ/balanced_train.jsonl"
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-    model = RobertaModel.from_pretrained('roberta-base')
+    tokenizer = RobertaTokenizer.from_pretrained('roberta-large')
+    model = RobertaModel.from_pretrained('roberta-large')
     model.to(device)
     model.eval()
 
